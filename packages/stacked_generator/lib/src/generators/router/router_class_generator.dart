@@ -37,6 +37,10 @@ class RouterClassGenerator extends BaseGenerator {
         "package:flutter/material.dart",
       if (routes.any((e) => e.routeType == RouteType.cupertino))
         "package:flutter/cupertino.dart",
+      if (routes.any((e) => e.routeType == RouteType.cupertinoSheet))
+        'package:modal_bottom_sheet/modal_bottom_sheet.dart',
+      if (routes.any((e) => e.routeType == RouteType.cupertinoSheet))
+        "package:stacked_generator/src/generators/router/bottom_sheet_container.dart",
     };
     routes.forEach((route) {
       imports.addAll(route.imports);
@@ -270,6 +274,8 @@ class RouterClassGenerator extends BaseGenerator {
       if (r.returnType!.contains('CustomRoute') ||
           r.returnType!.contains('MaterialRoute') ||
           r.returnType!.contains('CupertinoRoute') ||
+          r.returnType!.contains('MaterialWithModalsRoute') ||
+          r.returnType!.contains('CupertinoSheetRoute') ||
           r.returnType!.contains('AdaptiveRoute')) {
         // get the correct return type
         final type = r.returnType!.substring(
@@ -287,6 +293,12 @@ class RouterClassGenerator extends BaseGenerator {
     } else if (r.routeType == RouteType.material) {
       write(
           'return MaterialPageRoute<$returnType>(builder: (context) => $constructor, settings: data,');
+    } else if (r.routeType == RouteType.materialWithModal) {
+      write(
+          'return MaterialWithModalsPageRoute<$returnType>(builder: (context) => $constructor, settings: data,');
+    } else if (r.routeType == RouteType.cupertinoSheet) {
+      write(
+          'return CupertinoModalBottomSheetRoute<$returnType>(expanded: true, builder: (context) =>  BottomSheetContainer(child: $constructor), settings: data,');
     } else if (r.routeType == RouteType.adaptive) {
       write(
           'return buildAdaptivePageRoute<$returnType>(builder: (context) => $constructor, settings: data,');

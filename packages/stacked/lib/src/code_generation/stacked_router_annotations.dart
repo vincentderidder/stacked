@@ -33,10 +33,38 @@ class MaterialRouter extends StackedRouterAnnotation {
             routes);
 }
 
+// Defaults created routes to MaterialPageRoute unless
+// overridden by AutoRoute annotation
+class MaterialWithModalsRouter extends StackedRouterAnnotation {
+  const MaterialWithModalsRouter({
+    bool? generateNavigationHelperExtension,
+    String? routesClassName,
+    String? pathPrefix,
+    required List<StackedRoute> routes,
+  }) : super._(generateNavigationHelperExtension, routesClassName, pathPrefix,
+            routes);
+}
+
 // Defaults created routes to CupertinoPageRoute unless
 // overridden by AutoRoute annotation
 class CupertinoRouter extends StackedRouterAnnotation {
   const CupertinoRouter({
+    bool? generateNavigationHelperExtension,
+    String? routesClassName,
+    String? pathPrefix,
+    required List<StackedRoute> routes,
+  }) : super._(
+          generateNavigationHelperExtension,
+          routesClassName,
+          pathPrefix,
+          routes,
+        );
+}
+
+// Defaults created routes to CupertinoSheetRoute unless
+// overridden by AutoRoute annotation
+class CupertinoSheetRouter extends StackedRouterAnnotation {
+  const CupertinoSheetRouter({
     bool? generateNavigationHelperExtension,
     String? routesClassName,
     String? pathPrefix,
@@ -172,12 +200,59 @@ class MaterialRoute<T> extends StackedRoute<T> {
         );
 }
 
+class MaterialWithModalRoute<T> extends StackedRoute<T> {
+  const MaterialWithModalRoute(
+      {String? path,
+      required Type page,
+      bool? initial,
+      bool? fullscreenDialog,
+      bool? maintainState,
+      String? name,
+      List<Type>? guards,
+      List<StackedRoute>? children})
+      : super(
+          page: page,
+          guards: guards,
+          initial: initial,
+          fullscreenDialog: fullscreenDialog,
+          maintainState: maintainState,
+          path: path,
+          children: children,
+          name: name,
+        );
+}
+
 // forces usage of CupertinoPageRoute instead of MaterialPageRoute
 class CupertinoRoute<T> extends StackedRoute<T> {
   /// passed to the title property in [CupertinoPageRoute]
   final String? title;
 
   const CupertinoRoute(
+      {bool? initial,
+      bool? fullscreenDialog,
+      bool? maintainState,
+      String? path,
+      this.title,
+      String? name,
+      required Type page,
+      List<Type>? guards,
+      List<StackedRoute>? children})
+      : super(
+            initial: initial,
+            fullscreenDialog: fullscreenDialog,
+            maintainState: maintainState,
+            path: path,
+            name: name,
+            page: page,
+            guards: guards,
+            children: children);
+}
+
+class CupertinoSheetRoute<T> extends StackedRoute<T> {
+  /// passed to the title property in [CupertinoPageRoute]
+  final String? title;
+
+  const CupertinoSheetRoute(
       {bool? initial,
       bool? fullscreenDialog,
       bool? maintainState,

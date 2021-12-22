@@ -104,6 +104,13 @@ class RouteConfigResolver {
       routeConfig.routeType = RouteType.cupertino;
       routeConfig.cupertinoNavTitle = stackedRoute.peek('title')?.stringValue;
     } else if (stackedRoute
+        .instanceOf(TypeChecker.fromRuntime(CupertinoSheetRoute))) {
+      routeConfig.routeType = RouteType.cupertinoSheet;
+      routeConfig.cupertinoNavTitle = stackedRoute.peek('title')?.stringValue;
+    } else if (stackedRoute
+        .instanceOf(TypeChecker.fromRuntime(MaterialWithModalRoute))) {
+      routeConfig.routeType = RouteType.materialWithModal;
+    } else if (stackedRoute
         .instanceOf(TypeChecker.fromRuntime(AdaptiveRoute))) {
       routeConfig.routeType = RouteType.adaptive;
       routeConfig.cupertinoNavTitle =

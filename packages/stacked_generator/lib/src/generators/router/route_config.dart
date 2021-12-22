@@ -49,4 +49,6 @@ class RouteType {
   static const int cupertino = 1;
   static const int adaptive = 2;
   static const int custom = 3;
+  static const int materialWithModal = 4;
+  static const int cupertinoSheet = 5;
 }

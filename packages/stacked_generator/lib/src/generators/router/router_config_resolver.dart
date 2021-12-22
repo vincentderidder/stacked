@@ -71,6 +71,12 @@ class RouterConfigResolver {
       globalRouteConfig.routeType = RouteType.cupertino;
     } else if (stackedApp.instanceOf(TypeChecker.fromRuntime(AdaptiveRouter))) {
       globalRouteConfig.routeType = RouteType.adaptive;
+    } else if (stackedApp
+        .instanceOf(TypeChecker.fromRuntime(MaterialWithModalsRouter))) {
+      globalRouteConfig.routeType = RouteType.materialWithModal;
+    } else if (stackedApp
+        .instanceOf(TypeChecker.fromRuntime(CupertinoSheetRouter))) {
+      globalRouteConfig.routeType = RouteType.cupertinoSheet;
     } else if (stackedApp.instanceOf(TypeChecker.fromRuntime(CustomRouter))) {
       globalRouteConfig.routeType = RouteType.custom;
       globalRouteConfig.durationInMilliseconds =
