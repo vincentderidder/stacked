@@ -1,8 +1,8 @@
-import 'package:example/app/app.locator.dart';
-import 'package:example/app/app.logger.dart';
-import 'package:example/app/app.router.dart';
-import 'package:stacked/stacked.dart';
+import 'package:new_architecture/app/app.locator.dart';
+import 'package:new_architecture/app/app.logger.dart';
+import 'package:new_architecture/app/app.router.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:stacked/stacked.dart';
 
 import '../../app/app.locator.dart';
 import 'example_form_view.form.dart';
@@ -15,10 +15,8 @@ class ExampleFormViewModel extends FormViewModel {
   @override
   void setFormStatus() {
     log.i('Set form Status with data: $formValueMap');
-
-    // Set a validation message for the entire form
-    if (hasPasswordValidationMessage) {
-      setValidationMessage('Error in the form, please check again');
+    if (passwordValue?.isEmpty ?? false) {
+      setValidationMessage('You need to give a password');
     }
   }
 
@@ -27,12 +25,9 @@ class ExampleFormViewModel extends FormViewModel {
   // data to the backend or db.
 
   Future? saveData() {
-    return null;
-
     // here we can run custom functionality to save to our api
   }
 
-  void navigateToNewView() {
-    _navigationService.navigateTo(Routes.bottomNavExample);
-  }
+  Future? navigateSomewhere() =>
+      _navigationService.navigateTo(Routes.streamCounterView);
 }

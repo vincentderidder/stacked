@@ -20,15 +20,15 @@ class MultipleStreamsExampleView extends StatelessWidget {
                       alignment: Alignment.center,
                       color: Colors.yellow,
                       child: !viewModel.hasNumberData
-                          ? const CircularProgressIndicator()
+                          ? CircularProgressIndicator()
                           : Column(
                               children: <Widget>[
-                                Text('${viewModel.stringStreamDelay}ms'),
+                                Text(viewModel.stringStreamDelay.toString() + 'ms'),
                                 Text(viewModel.number.toString()),
                               ],
                             ),
                     ),
-                    const SizedBox(
+                    SizedBox(
                       width: 20,
                     ),
                     Container(
@@ -37,11 +37,11 @@ class MultipleStreamsExampleView extends StatelessWidget {
                       alignment: Alignment.center,
                       color: Colors.red,
                       child: !viewModel.hasRandomString
-                          ? const CircularProgressIndicator()
+                          ? CircularProgressIndicator()
                           : Column(
                               children: <Widget>[
                                 Text(
-                                    '${viewModel.numbersStreamDelay}ms'),
+                                    viewModel.numbersStreamDelay.toString() + 'ms'),
                                 Text(viewModel.randomString),
                               ],
                             ),
@@ -50,8 +50,8 @@ class MultipleStreamsExampleView extends StatelessWidget {
                 ),
               ),
               floatingActionButton: MaterialButton(
+                child: Text('Change Stream Source Faster'),
                 onPressed: viewModel.swapStreams,
-                child: const Text('Change Stream Source Faster'),
               ),
             ),
         viewModelBuilder: () => MultipleStreamsExampleViewModel());

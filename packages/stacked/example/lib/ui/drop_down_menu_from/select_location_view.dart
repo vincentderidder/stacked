@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked/stacked_annotations.dart';
 
-import 'select_location_view.form.dart';
 import 'select_location_viewmodel.dart';
+import 'select_location_view.form.dart';
 
 @FormView(fields: [
   FormDropdownField(name: 'country', items: [
@@ -66,20 +66,20 @@ class SelectLocationView extends StatelessWidget with $SelectLocationView {
       },
       viewModelBuilder: () => SelectLocationViewModel(),
       builder: (context, model, child) => Scaffold(
-        backgroundColor: const Color.fromARGB(255, 26, 27, 30),
+        backgroundColor: Color.fromARGB(255, 26, 27, 30),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
+            padding: EdgeInsets.symmetric(horizontal: 20),
             child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-              const Text("Select Location",
+              Text("Select Location",
                   style:
                       TextStyle(fontSize: 20.0, fontWeight: FontWeight.w800)),
-              const Text("Manually select your location"),
-              const SizedBox(height: 20),
+              Text("Manually select your location"),
+              SizedBox(height: 20),
               Row(
                 children: [
-                  const Text('Country'),
-                  const SizedBox(width: 15),
+                  Text('Country'),
+                  SizedBox(width: 15),
                   DropdownButton<String>(
                     value: model.countryValue,
                     onChanged: (value) {
@@ -96,11 +96,11 @@ class SelectLocationView extends StatelessWidget with $SelectLocationView {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Row(
                 children: [
-                  const Text('State &#x2F; Province'),
-                  const SizedBox(width: 15),
+                  Text('State &#x2F; Province'),
+                  SizedBox(width: 15),
                   DropdownButton<String>(
                     value: model.provinceValue,
                     onChanged: (value) {
@@ -117,7 +117,7 @@ class SelectLocationView extends StatelessWidget with $SelectLocationView {
                   ),
                 ],
               ),
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
             ]),
           ),
         ),

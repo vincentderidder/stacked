@@ -6,7 +6,7 @@ class ImportResolver {
   final List<LibraryElement> libs;
   final String targetFilePath;
 
-  const ImportResolver(this.libs, this.targetFilePath);
+  ImportResolver(this.libs, this.targetFilePath);
 
   String? resolve(Element? element) {
     // return early if source is null or element is a core type
@@ -27,7 +27,6 @@ class ImportResolver {
         }
       }
     }
-    return null;
   }
 
   bool _isCoreDartType(Element? element) {

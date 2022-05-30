@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:stacked_core/stacked_core.dart';
 import 'package:stacked_themes/src/locator_setup.dart';
 import 'package:stacked_themes/src/services/platform_service.dart';
 import 'package:stacked_themes/src/services/shared_preferences_service.dart';
@@ -51,7 +50,7 @@ class ThemeManager {
   /// Returns the current selected theme mode
   ThemeMode? get selectedThemeMode => _selectedThemeMode;
 
-  ThemeModel get initialTheme => _initialTheme!;
+  ThemeModel get initalTheme => _initialTheme!;
 
   /// A builder function that provides you with the new selected theme that expects you to
   /// return a color for the status bar.
@@ -120,9 +119,9 @@ You can supply either a list of ThemeData objects to the themes property or a li
       }
 
       if (_selectedThemeMode == ThemeMode.system) {
-        final brightness =
-            ambiguate(SchedulerBinding.instance)!.window.platformBrightness;
-        selectedTheme = brightness == Brightness.dark ? darkTheme : lightTheme;
+        final brighteness =
+            SchedulerBinding.instance?.window.platformBrightness;
+        selectedTheme = brighteness == Brightness.dark ? darkTheme : lightTheme;
       } else {
         selectedTheme =
             _selectedThemeMode == ThemeMode.dark ? darkTheme : lightTheme;
@@ -219,7 +218,7 @@ You can supply either a list of ThemeData objects to the themes property or a li
           _selectedThemeMode == ThemeMode.dark ? darkTheme : lightTheme);
     } else {
       var currentBrightness =
-          ambiguate(SchedulerBinding.instance)!.window.platformBrightness;
+          SchedulerBinding.instance!.window.platformBrightness;
       updateOverlayColors(
           currentBrightness == Brightness.dark ? darkTheme : lightTheme);
     }

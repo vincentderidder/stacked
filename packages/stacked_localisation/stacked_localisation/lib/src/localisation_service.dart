@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:stacked_core/stacked_core.dart';
 import 'package:stacked_localisation/src/setup_locator.dart';
 import 'package:stacked_localisation/src/utils/locale_provider.dart';
 import 'package:stacked_localisation/src/utils/string_reader.dart';
@@ -8,25 +7,25 @@ class LocalisationService with WidgetsBindingObserver {
   final _localeProvider = locator<LocaleProvider>();
   final _stringReader = locator<StringReader>();
 
-  static LocalisationService? _instance = null;
+  static LocalisationService _instance;
 
   static Future<LocalisationService> getInstance() async {
     if (_instance == null) {
       _setupLocator();
       _instance = LocalisationService();
-      await _instance?.initialise();
+      await _instance.initialise();
     }
-    return _instance!;
+    return _instance;
   }
 
   LocalisationService() {
-    ambiguate(WidgetsBinding.instance)!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   /// Stores the Strings for the locale that the service was initialised with
-  Map<String, String>? _localisedStrings = null;
+  Map<String, String> _localisedStrings;
 
-  String operator [](String key) => _localisedStrings?[key] ?? key;
+  String operator [](String key) => _localisedStrings[key];
 
   Future initialise() async {
     var locale = await _localeProvider.getCurrentLocale();
@@ -41,11 +40,9 @@ class LocalisationService with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeLocales(List<Locale>? locale) async {
-    final currentLocale = locale?.first.toString();
-    if(currentLocale?.isNotEmpty == true) {
-      _localisedStrings = await _stringReader.getStringsFromAssets(currentLocale!);
-    }
+  void didChangeLocales(List<Locale> locale) async {
+    final currentLocale = locale.first.toString();
+    _localisedStrings = await _stringReader.getStringsFromAssets(currentLocale);
   }
 
   // @override

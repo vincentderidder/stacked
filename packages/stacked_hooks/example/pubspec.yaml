@@ -25,13 +25,8 @@ dependencies:
   cupertino_icons: ^0.1.2
   stacked:
   stacked_hooks:
-  flutter_hooks:
-
-dependency_overrides: 
-  stacked:
-    path: ../../stacked/
-  stacked_hooks:
     path: ../
+  flutter_hooks:
 
 dev_dependencies:
   flutter_test:

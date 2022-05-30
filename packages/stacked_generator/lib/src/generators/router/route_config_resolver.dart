@@ -1,80 +1,57 @@
 import 'package:analyzer/dart/element/element.dart';
-import 'package:source_gen/source_gen.dart';
-import 'package:stacked_core/stacked_core.dart';
-
+import 'package:stacked/stacked_annotations.dart';
 import 'package:stacked_generator/import_resolver.dart';
+import 'package:stacked_generator/route_config_resolver.dart';
 import 'package:stacked_generator/utils.dart';
-
-import 'models/route_guard_config.dart';
-import 'models/route_parameter_config.dart';
-import 'route_config/route_config.dart';
+import 'package:source_gen/source_gen.dart';
 
 const TypeChecker stackedRouteChecker = TypeChecker.fromRuntime(StackedRoute);
 
 // extracts route configs from class fields
 class RouteConfigResolver {
-  final String? routeNamePrefex;
+  final RouterConfig _routerConfig;
   final ImportResolver _importResolver;
 
-  const RouteConfigResolver(
-    this.routeNamePrefex,
-    this._importResolver,
-  );
+  RouteConfigResolver(this._routerConfig, this._importResolver);
 
   Future<RouteConfig> resolve(ConstantReader stackedRoute) async {
-    final dartType = stackedRoute.read('page').typeValue;
-    throwIf(
-      dartType.element is! ClassElement,
-      '${toDisplayString(dartType)} is not a class element',
-      element: dartType.element!,
-    );
-    Set<String> imports = {};
+    final routeConfig = RouteConfig();
+    final type = stackedRoute.read('page').typeValue;
 
-    final extractedGuards = stackedRoute.peek('guards')?.listValue.where((g) {
-      final guard = g.toTypeValue();
-      return guard != null && guard.element != null;
-    }).map((g) {
-      final guard = g.toTypeValue();
-      return RouteGuardConfig(
-          type: toDisplayString(guard!),
-          import: _importResolver.resolve((guard.element)!));
-    }).toList();
-
-    final classElement = dartType.element as ClassElement;
-    final className = toDisplayString(dartType);
+    final classElement = type.element as ClassElement;
 
     final import = _importResolver.resolve(classElement);
-    if (import != null) imports.add(import);
+    if (import != null) {
+      routeConfig.imports.add(import);
+    }
 
-    String? pathName = stackedRoute.peek('path')?.stringValue;
-    if (pathName == null) {
+    routeConfig.className = toDisplayString(type);
+    var path = stackedRoute.peek('path')?.stringValue;
+    if (path == null) {
       if (stackedRoute.peek('initial')?.boolValue == true) {
-        pathName = '/';
+        path = '/';
       } else {
-        pathName = '${routeNamePrefex}${toKababCase(className)}';
+        path =
+            '${_routerConfig.routeNamePrefix}${toKababCase(routeConfig.className!)}';
       }
     }
+    routeConfig.pathName = path;
 
-    final returnType = stackedRoute.objectValue.type;
+    throwIf(
+      type.element is! ClassElement,
+      '${toDisplayString(type)} is not a class element',
+      element: type.element!,
+    );
 
-    if (returnType != null && returnType != 'dynamic') {
-      imports.addAll(_importResolver.resolveAll(returnType));
-    }
+    await _extractRouteMetaData(routeConfig, stackedRoute);
 
-    var baseRouteConfig = RouteConfig(
-        hasWrapper: classElement.allSupertypes
-            .map<String>((el) => toDisplayString(el))
-            .contains('StackedRouteWrapper'),
-        returnType: toDisplayString(returnType!),
-        pathName: pathName,
-        name: stackedRoute.peek('name')?.stringValue ??
-            toLowerCamelCase(className),
-        maintainState: stackedRoute.peek('maintainState')?.boolValue ?? true,
-        imports: imports,
-        guards: extractedGuards ?? [],
-        className: className,
-        fullscreenDialog:
-            stackedRoute.peek('fullscreenDialog')?.boolValue ?? false);
+    routeConfig.name = stackedRoute.peek('name')?.stringValue ??
+        toLowerCamelCase(routeConfig.className!);
+
+    routeConfig.hasWrapper = classElement.allSupertypes
+        .map<String>((el) => toDisplayString(el))
+        .contains('StackedRouteWrapper');
+
     final constructor = classElement.unnamedConstructor;
 
     var params = constructor?.parameters;
@@ -82,17 +59,100 @@ class RouteConfigResolver {
       if (constructor!.isConst &&
           params!.length == 1 &&
           toDisplayString(params.first.type) == 'Key') {
-        baseRouteConfig = baseRouteConfig.copyWith(hasConstConstructor: true);
+        routeConfig.hasConstConstructor = true;
       } else {
         final paramResolver = RouteParameterResolver(_importResolver);
+        routeConfig.parameters = [];
         for (ParameterElement p in constructor.parameters) {
-          baseRouteConfig = baseRouteConfig.copyWith(parameters: [
-            ...baseRouteConfig.parameters,
-            paramResolver.resolve(p)
-          ]);
+          routeConfig.parameters?.add(await paramResolver.resolve(p));
         }
       }
     }
-    return baseRouteConfig.toSpecificType(stackedRoute, _importResolver);
+    // _validatePathParams(routeConfig, classElement);
+    return routeConfig;
+  }
+
+  Future<void> _extractRouteMetaData(
+      RouteConfig routeConfig, ConstantReader stackedRoute) async {
+    routeConfig.fullscreenDialog =
+        stackedRoute.peek('fullscreenDialog')?.boolValue;
+    routeConfig.maintainState = stackedRoute.peek('maintainState')?.boolValue;
+
+    stackedRoute
+        .peek('guards')
+        ?.listValue
+        .map((g) => g.toTypeValue())
+        .forEach((guard) {
+      if (guard != null && guard.element != null) {
+        routeConfig.guards.add(RouteGuardConfig(
+            type: toDisplayString(guard),
+            import: _importResolver.resolve((guard.element)!)));
+      }
+    });
+
+    final returnType = stackedRoute.objectValue.type;
+    routeConfig.returnType = toDisplayString(returnType!);
+
+    if (routeConfig.returnType != 'dynamic') {
+      routeConfig.imports.addAll(_importResolver.resolveAll(returnType));
+    }
+
+    if (stackedRoute.instanceOf(TypeChecker.fromRuntime(MaterialRoute))) {
+      routeConfig.routeType = RouteType.material;
+    } else if (stackedRoute
+        .instanceOf(TypeChecker.fromRuntime(CupertinoRoute))) {
+      routeConfig.routeType = RouteType.cupertino;
+      routeConfig.cupertinoNavTitle = stackedRoute.peek('title')?.stringValue;
+    } else if (stackedRoute
+        .instanceOf(TypeChecker.fromRuntime(CupertinoSheetRoute))) {
+      routeConfig.routeType = RouteType.cupertinoSheet;
+      routeConfig.cupertinoNavTitle = stackedRoute.peek('title')?.stringValue;
+    } else if (stackedRoute
+        .instanceOf(TypeChecker.fromRuntime(MaterialWithModalRoute))) {
+      routeConfig.routeType = RouteType.materialWithModal;
+    } else if (stackedRoute
+        .instanceOf(TypeChecker.fromRuntime(AdaptiveRoute))) {
+      routeConfig.routeType = RouteType.adaptive;
+      routeConfig.cupertinoNavTitle =
+          stackedRoute.peek('cupertinoPageTitle')?.stringValue;
+    } else if (stackedRoute.instanceOf(TypeChecker.fromRuntime(CustomRoute))) {
+      routeConfig.routeType = RouteType.custom;
+      routeConfig.durationInMilliseconds =
+          stackedRoute.peek('durationInMilliseconds')?.intValue;
+      routeConfig.reverseDurationInMilliseconds =
+          stackedRoute.peek('reverseDurationInMilliseconds')?.intValue;
+      routeConfig.customRouteOpaque = stackedRoute.peek('opaque')?.boolValue;
+      routeConfig.customRouteBarrierDismissible =
+          stackedRoute.peek('barrierDismissible')?.boolValue;
+      final function = stackedRoute
+          .peek('transitionsBuilder')
+          ?.objectValue
+          .toFunctionValue();
+      if (function != null) {
+        final displayName = function.displayName.replaceFirst(RegExp('^_'), '');
+        final functionName = function.isStatic
+            ? '${function.enclosingElement.displayName}.$displayName'
+            : displayName;
+
+        var import;
+        if (function.enclosingElement.name != 'TransitionsBuilders') {
+          import = _importResolver.resolve(function);
+        }
+        routeConfig.transitionBuilder =
+            CustomTransitionBuilder(functionName, import);
+      }
+    } else {
+      var globConfig = _routerConfig.globalRouteConfig;
+      routeConfig.routeType = globConfig?.routeType ?? RouteType.material;
+      if (globConfig?.routeType == RouteType.custom) {
+        routeConfig.transitionBuilder = globConfig?.transitionBuilder;
+        routeConfig.durationInMilliseconds = globConfig?.durationInMilliseconds;
+        routeConfig.reverseDurationInMilliseconds =
+            globConfig?.reverseDurationInMilliseconds;
+        routeConfig.customRouteBarrierDismissible =
+            globConfig?.customRouteBarrierDismissible;
+        routeConfig.customRouteOpaque = globConfig?.customRouteOpaque;
+      }
+    }
   }
 }

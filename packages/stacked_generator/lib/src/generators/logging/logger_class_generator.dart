@@ -1,6 +1,4 @@
-import 'package:meta/meta.dart';
 import 'package:stacked_generator/src/generators/base_generator.dart';
-import 'package:stacked_generator/src/generators/extensions/list_utils_extension.dart';
 import 'package:stacked_generator/src/generators/logging/logger_config.dart';
 
 import 'logger_class_content.dart';
@@ -9,32 +7,46 @@ import 'logger_class_content.dart';
 class LoggerClassGenerator extends BaseGenerator {
   final LoggerConfig _loggerConfig;
 
-  LoggerClassGenerator(this._loggerConfig);
+  LoggerClassGenerator(LoggerConfig loggerConfig)
+      : _loggerConfig = loggerConfig;
 
-  @override
-  String generate() {
-    writeImports(_loggerConfig.imports, prefex: loggerClassPrefex);
+  Future<String> generate() async {
+    // TODO: Refactor the way we do this to make more sense.
+    // TODO: Use O from SOLID principles (open / closed) to Close implementation
+    final _logHelperNameKey = _loggerConfig.logHelperName;
+    final _imports = _generateImports(_loggerConfig.imports);
+    final _multiLogger = _generateMultiLoggers(_loggerConfig.loggerOutputs);
 
-    write(loggerClassConstantBody);
+    final _replacedHelperName =
+        loggerClassContent.replaceFirst(LogHelperNameKey, _logHelperNameKey);
 
-    customizeLoggerNameAndOutputs(loggerClassNameAndOutputs);
+    final _replacedImports =
+        _replacedHelperName.replaceFirst(MultiLoggerImports, _imports);
 
-    return serializeStringBuffer;
+    final _replacedConditionalLogger = _replacedImports.replaceFirst(
+        DisableConsoleOutputInRelease,
+        _loggerConfig.disableReleaseConsoleOutput ? 'if(!kReleaseMode)' : '');
+
+    write(_replacedConditionalLogger.replaceFirst(
+        MultipleLoggerOutput, _multiLogger));
+
+    return stringBuffer.toString();
   }
 
-  @visibleForTesting
-  void customizeLoggerNameAndOutputs(String template) {
-    final withHelperNameInPlace =
-        template.replaceFirst(LogHelperNameKey, _loggerConfig.logHelperName);
+  String _generateMultiLoggers(List<String> multiLogger) {
+    final _multiLoggers = StringBuffer();
 
-    String withConditionalLoggerInPlace = withHelperNameInPlace.replaceFirst(
-        DisableConsoleOutputInRelease,
-        _loggerConfig.disableReleaseConsoleOutput ? 'if(!_isReleaseMode)' : '');
+    multiLogger.forEach((element) {
+      _multiLoggers.write("$element(),");
+    });
+    return _multiLoggers.toString();
+  }
 
-    String loggerOutputsInPlace = withConditionalLoggerInPlace.replaceFirst(
-        MultipleLoggerOutput,
-        _loggerConfig.loggerOutputs.addCheckForReleaseModeToEachLogger);
-
-    write(loggerOutputsInPlace);
+  String _generateImports(Set<String> imports) {
+    final _importBuffer = StringBuffer();
+    imports.forEach((element) {
+      _importBuffer.writeln("import '$element';");
+    });
+    return _importBuffer.toString();
   }
 }

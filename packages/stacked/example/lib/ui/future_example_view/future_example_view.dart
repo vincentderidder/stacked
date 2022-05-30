@@ -14,14 +14,14 @@ class FutureExampleView extends StatelessWidget {
             ? Container(
                 color: Colors.red,
                 alignment: Alignment.center,
-                child: const Text(
+                child: Text(
                   'An error has occered while running the future',
                   style: TextStyle(color: Colors.white),
                 ),
               )
             : Center(
                 child: viewModel.isBusy
-                    ? const CircularProgressIndicator()
+                    ? CircularProgressIndicator()
                     : Text(viewModel.data!),
               ),
       ),

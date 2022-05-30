@@ -19,8 +19,8 @@ class TestFutureViewModel extends FutureViewModel<int?> {
 
   @override
   Future<int?> futureToRun() async {
-    await Future.delayed(Duration(milliseconds: 20));
     if (fail) throw Exception(_SingleFutureExceptionFailMessage);
+    await Future.delayed(Duration(milliseconds: 20));
     return numberToReturn;
   }
 

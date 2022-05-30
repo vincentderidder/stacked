@@ -1,4 +1,4 @@
-import '../../app/app.locator.dart';
+import 'package:example/app/locator.dart';
 import 'package:example/enums/bottomsheet_type.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -6,7 +6,7 @@ import 'package:stacked_services/stacked_services.dart';
 import '../setup_bottom_sheet_ui.dart';
 
 class BottomSheetView extends StatelessWidget {
-  BottomSheetView({Key? key}) : super(key: key);
+  BottomSheetView({Key key}) : super(key: key);
 
   final BottomSheetService _bottomSheetService = locator<BottomSheetService>();
 
@@ -107,7 +107,7 @@ class BottomSheetView extends StatelessWidget {
 
               print('confirmationResponse confirmed: ${response?.confirmed}');
 
-              print('response ${response?.data?.message}');
+              print('response ${response.data.message}');
             },
             child: Text(
               'Show Generic Custom Bottom Sheet',

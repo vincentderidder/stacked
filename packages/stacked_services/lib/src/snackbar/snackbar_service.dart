@@ -1,11 +1,10 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:stacked_core/stacked_core.dart' as sc;
 import 'package:stacked_services/src/exceptions/custom_snackbar_exception.dart';
 import 'package:stacked_services/src/snackbar/snackbar_config.dart';
-import 'stacked_snackbar_customizations.dart';
 
 /// A service that allows the user to show the snackbar from a ViewModel
 class SnackbarService {
@@ -116,7 +115,7 @@ class SnackbarService {
       barBlur: _snackbarConfig?.barBlur,
       isDismissible: _snackbarConfig?.isDismissible ?? true,
       duration: duration,
-      snackPosition: _snackbarConfig?.snackPosition.toGet,
+      snackPosition: _snackbarConfig?.snackPosition ?? SnackPosition.BOTTOM,
       backgroundColor: _snackbarConfig?.backgroundColor ?? Colors.grey[800],
       margin: _snackbarConfig?.margin ??
           const EdgeInsets.symmetric(horizontal: 10, vertical: 25),
@@ -126,13 +125,10 @@ class SnackbarService {
 
   Future? showCustomSnackBar({
     required String message,
-    TextStyle? messageTextStyle,
     @deprecated dynamic customData,
     dynamic variant,
     String? title,
-    TextStyle? titleTextStyle,
     String? mainButtonTitle,
-    ButtonStyle? mainButtonStyle,
     void Function()? onMainButtonTapped,
     Function? onTap,
     Duration duration = const Duration(seconds: 1),
@@ -165,7 +161,6 @@ class SnackbarService {
         ? mainButtonBuilder!(mainButtonTitle, onMainButtonTapped)
         : _getMainButtonWidget(
             mainButtonTitle: mainButtonTitle,
-            mainButtonStyle: snackbarConfig.mainButtonStyle ?? mainButtonStyle,
             onMainButtonTapped: onMainButtonTapped,
             config: snackbarConfig,
           );
@@ -176,27 +171,22 @@ class SnackbarService {
           ? Text(
               title,
               key: Key('snackbar_text_title'),
-              style: snackbarConfig.titleTextStyle ??
-                  titleTextStyle ??
-                  TextStyle(
-                    color:
-                        snackbarConfig.titleColor ?? snackbarConfig.textColor,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 16,
-                  ),
+              style: TextStyle(
+                color: snackbarConfig.titleColor ?? snackbarConfig.textColor,
+                fontWeight: FontWeight.w800,
+                fontSize: 16,
+              ),
               textAlign: snackbarConfig.titleTextAlign,
             )
-          : snackbarConfig.titleText ?? null,
+          : null,
       messageText: Text(
         message,
         key: Key('snackbar_text_message'),
-        style: snackbarConfig.messageTextStyle ??
-            messageTextStyle ??
-            TextStyle(
-              color: snackbarConfig.messageColor ?? snackbarConfig.textColor,
-              fontWeight: FontWeight.w300,
-              fontSize: 14,
-            ),
+        style: TextStyle(
+          color: snackbarConfig.messageColor ?? snackbarConfig.textColor,
+          fontWeight: FontWeight.w300,
+          fontSize: 14,
+        ),
         textAlign: snackbarConfig.messageTextAlign,
       ),
       icon: snackbarConfig.icon,
@@ -221,8 +211,8 @@ class SnackbarService {
       progressIndicatorBackgroundColor:
           snackbarConfig.progressIndicatorBackgroundColor,
       progressIndicatorValueColor: snackbarConfig.progressIndicatorValueColor,
-      snackPosition: snackbarConfig.snackPosition.toGet,
-      snackStyle: snackbarConfig.snackStyle.toGet,
+      snackPosition: snackbarConfig.snackPosition,
+      snackStyle: snackbarConfig.snackStyle,
       forwardAnimationCurve: snackbarConfig.forwardAnimationCurve,
       reverseAnimationCurve: snackbarConfig.reverseAnimationCurve,
       animationDuration: snackbarConfig.animationDuration,
@@ -236,7 +226,7 @@ class SnackbarService {
       return getBar.show();
     } else {
       Completer completer = new Completer();
-      sc.ambiguate(WidgetsBinding.instance)!.addPostFrameCallback((_) async {
+      WidgetsBinding.instance?.addPostFrameCallback((_) async {
         final result = await getBar.show();
         completer.complete(result);
       });
@@ -246,7 +236,6 @@ class SnackbarService {
 
   TextButton? _getMainButtonWidget({
     String? mainButtonTitle,
-    ButtonStyle? mainButtonStyle,
     void Function()? onMainButtonTapped,
     SnackbarConfig? config,
   }) {
@@ -256,7 +245,6 @@ class SnackbarService {
 
     return TextButton(
       key: Key('snackbar_touchable_mainButton'),
-      style: mainButtonStyle,
       child: Text(
         mainButtonTitle,
         key: Key('snackbar_text_mainButtonTitle'),

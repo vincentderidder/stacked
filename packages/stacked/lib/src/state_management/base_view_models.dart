@@ -230,12 +230,11 @@ class _SingleDataSourceViewModel<T> extends DynamicSourceViewModel {
   bool get dataReady => _data != null && !hasError;
 }
 
-class _MultiDataSourceViewModel<K extends Object>
-    extends DynamicSourceViewModel {
-  Map<K, dynamic>? _dataMap;
-  Map<K, dynamic>? get dataMap => _dataMap;
+class _MultiDataSourceViewModel extends DynamicSourceViewModel {
+  Map<String, dynamic>? _dataMap;
+  Map<String, dynamic>? get dataMap => _dataMap;
 
-  bool dataReady(K key) => _dataMap![key] != null && (error(key) == null);
+  bool dataReady(String key) => _dataMap![key] != null && (error(key) == null);
 }
 
 /// Provides functionality for a ViewModel that's sole purpose it is to fetch data using a [Future]
@@ -262,7 +261,7 @@ abstract class FutureViewModel<T> extends _SingleDataSourceViewModel<T>
     setBusy(true);
     notifyListeners();
 
-    _data = await runBusyFuture<T?>(futureToRun(), throwException: true)
+    _data = await (runBusyFuture<T>(futureToRun(), throwException: true)
         .catchError((error) {
       setError(error);
       _error = error;
@@ -272,9 +271,7 @@ abstract class FutureViewModel<T> extends _SingleDataSourceViewModel<T>
       if (rethrowException) {
         throw error;
       }
-
-      return null;
-    });
+    }));
 
     if (_data != null) {
       onData(_data);
@@ -375,9 +372,9 @@ abstract class MultipleStreamViewModel extends _MultiDataSourceViewModel
     if (!changeSource) {
       notifyListeners();
     }
-    final _streamsMapValues = Map<String, StreamData>.from(streamsMap);
+    var _streamsMapValues = Map<String, StreamData>.from(streamsMap);
 
-    for (final key in _streamsMapValues.keys) {
+    for (var key in _streamsMapValues.keys) {
       // If a lifecycle function isn't supplied, we fallback to default
       _streamsSubscriptions![key] = _streamsMapValues[key]!.stream.listen(
         (incomingData) {

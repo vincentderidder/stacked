@@ -7,7 +7,6 @@
 // ignore_for_file: public_member_api_docs
 
 import 'package:flutter/material.dart';
-import 'package:example/ui/form/validators.dart';
 import 'package:stacked/stacked.dart';
 
 const String EmailValueKey = 'email';
@@ -21,38 +20,14 @@ const Map<String, String> DoYouLoveFoodValueToTitleMap = {
   'NoDr': 'No',
 };
 
-final Map<String, TextEditingController>
-    _ExampleFormViewTextEditingControllers = {
-  EmailValueKey: TextEditingController(text: 'Lorem'),
-  PasswordValueKey: TextEditingController(),
-  ShortBioValueKey: TextEditingController(),
-};
-
-final Map<String, FocusNode> _ExampleFormViewFocusNodes = {
-  EmailValueKey: FocusNode(),
-  PasswordValueKey: FocusNode(),
-  ShortBioValueKey: FocusNode(),
-};
-
-final Map<String, String? Function(String?)?> _ExampleFormViewTextValidations =
-    {
-  EmailValueKey: FormValidators.emailValidator,
-  PasswordValueKey: FormValidators.passwordValidator,
-  ShortBioValueKey: null,
-};
-
 mixin $ExampleFormView on StatelessWidget {
-  TextEditingController get emailController =>
-      _ExampleFormViewTextEditingControllers[EmailValueKey]!;
-  TextEditingController get passwordController =>
-      _ExampleFormViewTextEditingControllers[PasswordValueKey]!;
-  TextEditingController get shortBioController =>
-      _ExampleFormViewTextEditingControllers[ShortBioValueKey]!;
-  FocusNode get emailFocusNode => _ExampleFormViewFocusNodes[EmailValueKey]!;
-  FocusNode get passwordFocusNode =>
-      _ExampleFormViewFocusNodes[PasswordValueKey]!;
-  FocusNode get shortBioFocusNode =>
-      _ExampleFormViewFocusNodes[ShortBioValueKey]!;
+  final TextEditingController emailController =
+      TextEditingController(text: 'Lorem');
+  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController shortBioController = TextEditingController();
+  final FocusNode emailFocusNode = FocusNode();
+  final FocusNode passwordFocusNode = FocusNode();
+  final FocusNode shortBioFocusNode = FocusNode();
 
   /// Registers a listener on every generated controller that calls [model.setData()]
   /// with the latest textController values
@@ -63,34 +38,14 @@ mixin $ExampleFormView on StatelessWidget {
   }
 
   /// Updates the formData on the FormViewModel
-  void _updateFormData(FormViewModel model) {
-    model.setData(
-      model.formValueMap
-        ..addAll({
-          EmailValueKey: emailController.text,
-          PasswordValueKey: passwordController.text,
-          ShortBioValueKey: shortBioController.text,
-        }),
-    );
-    _updateValidationData(model);
-  }
-
-  /// Updates the fieldsValidationMessages on the FormViewModel
-  void _updateValidationData(FormViewModel model) =>
-      model.setValidationMessages({
-        EmailValueKey: _getValidationMessage(EmailValueKey),
-        PasswordValueKey: _getValidationMessage(PasswordValueKey),
-        ShortBioValueKey: _getValidationMessage(ShortBioValueKey),
-      });
-
-  /// Returns the validation message for the given key
-  String? _getValidationMessage(String key) {
-    final validatorForKey = _ExampleFormViewTextValidations[key];
-    if (validatorForKey == null) return null;
-    String? validationMessageForKey =
-        validatorForKey(_ExampleFormViewTextEditingControllers[key]!.text);
-    return validationMessageForKey;
-  }
+  void _updateFormData(FormViewModel model) => model.setData(
+        model.formValueMap
+          ..addAll({
+            EmailValueKey: emailController.text,
+            PasswordValueKey: passwordController.text,
+            ShortBioValueKey: shortBioController.text,
+          }),
+      );
 
   /// Calls dispose on all the generated controllers and focus nodes
   void disposeForm() {
@@ -106,39 +61,18 @@ mixin $ExampleFormView on StatelessWidget {
 }
 
 extension ValueProperties on FormViewModel {
-  String? get emailValue => formValueMap[EmailValueKey] as String?;
-  String? get passwordValue => formValueMap[PasswordValueKey] as String?;
-  String? get shortBioValue => formValueMap[ShortBioValueKey] as String?;
-  String? get birthDateValue => formValueMap[BirthDateValueKey] as String?;
-  String? get doYouLoveFoodValue =>
-      formValueMap[DoYouLoveFoodValueKey] as String?;
+  String? get emailValue => this.formValueMap[EmailValueKey];
+  String? get passwordValue => this.formValueMap[PasswordValueKey];
+  String? get shortBioValue => this.formValueMap[ShortBioValueKey];
+  DateTime? get birthDateValue => this.formValueMap[BirthDateValueKey];
+  String? get doYouLoveFoodValue => this.formValueMap[DoYouLoveFoodValueKey];
 
-  bool get hasEmail => formValueMap.containsKey(EmailValueKey);
-  bool get hasPassword => formValueMap.containsKey(PasswordValueKey);
-  bool get hasShortBio => formValueMap.containsKey(ShortBioValueKey);
-  bool get hasBirthDate => formValueMap.containsKey(BirthDateValueKey);
-  bool get hasDoYouLoveFood => formValueMap.containsKey(DoYouLoveFoodValueKey);
-
-  bool get hasEmailValidationMessage =>
-      fieldsValidationMessages[EmailValueKey]?.isNotEmpty ?? false;
-  bool get hasPasswordValidationMessage =>
-      fieldsValidationMessages[PasswordValueKey]?.isNotEmpty ?? false;
-  bool get hasShortBioValidationMessage =>
-      fieldsValidationMessages[ShortBioValueKey]?.isNotEmpty ?? false;
-  bool get hasBirthDateValidationMessage =>
-      fieldsValidationMessages[BirthDateValueKey]?.isNotEmpty ?? false;
-  bool get hasDoYouLoveFoodValidationMessage =>
-      fieldsValidationMessages[DoYouLoveFoodValueKey]?.isNotEmpty ?? false;
-
-  String? get emailValidationMessage => fieldsValidationMessages[EmailValueKey];
-  String? get passwordValidationMessage =>
-      fieldsValidationMessages[PasswordValueKey];
-  String? get shortBioValidationMessage =>
-      fieldsValidationMessages[ShortBioValueKey];
-  String? get birthDateValidationMessage =>
-      fieldsValidationMessages[BirthDateValueKey];
-  String? get doYouLoveFoodValidationMessage =>
-      fieldsValidationMessages[DoYouLoveFoodValueKey];
+  bool get hasEmail => this.formValueMap.containsKey(EmailValueKey);
+  bool get hasPassword => this.formValueMap.containsKey(PasswordValueKey);
+  bool get hasShortBio => this.formValueMap.containsKey(ShortBioValueKey);
+  bool get hasBirthDate => this.formValueMap.containsKey(BirthDateValueKey);
+  bool get hasDoYouLoveFood =>
+      this.formValueMap.containsKey(DoYouLoveFoodValueKey);
 }
 
 extension Methods on FormViewModel {
@@ -153,24 +87,13 @@ extension Methods on FormViewModel {
         firstDate: firstDate,
         lastDate: lastDate);
     if (selectedDate != null) {
-      final dateString =
-          '${selectedDate.day}/${selectedDate.month}/${selectedDate.year}';
-      setData(formValueMap..addAll({BirthDateValueKey: dateString}));
+      this.setData(
+          this.formValueMap..addAll({BirthDateValueKey: selectedDate}));
     }
   }
 
   void setDoYouLoveFood(String doYouLoveFood) {
-    setData(formValueMap..addAll({DoYouLoveFoodValueKey: doYouLoveFood}));
+    this.setData(
+        this.formValueMap..addAll({DoYouLoveFoodValueKey: doYouLoveFood}));
   }
-
-  setEmailValidationMessage(String? validationMessage) =>
-      fieldsValidationMessages[EmailValueKey] = validationMessage;
-  setPasswordValidationMessage(String? validationMessage) =>
-      fieldsValidationMessages[PasswordValueKey] = validationMessage;
-  setShortBioValidationMessage(String? validationMessage) =>
-      fieldsValidationMessages[ShortBioValueKey] = validationMessage;
-  setBirthDateValidationMessage(String? validationMessage) =>
-      fieldsValidationMessages[BirthDateValueKey] = validationMessage;
-  setDoYouLoveFoodValidationMessage(String? validationMessage) =>
-      fieldsValidationMessages[DoYouLoveFoodValueKey] = validationMessage;
 }
