@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:stacked_services/stacked_services.dart';
-import '../../stacked_services.dart';
+
+import 'stacked_snackbar_customizations.dart';
 
 /// Stores the configuration for the visual appearance of a snackbar
 class SnackbarConfig {
@@ -24,15 +23,22 @@ class SnackbarConfig {
   /// Sets the color of the title text regardless of [textColor]
   Color? titleColor;
 
+  /// Defines a custom style for the title shown in [showCustomSnackbar].
+  TextStyle? titleTextStyle;
+
   /// Sets the color of all the test
   Color textColor;
 
   /// Sets the color of the message text regardless of [textColor]
   Color? messageColor;
 
+  /// Sets a custom style for the message shown in [showCustomSnackbar].
+  TextStyle? messageTextStyle;
+
   /// Sets the color of the main button text regardless of [textColor]
   Color? mainButtonTextColor;
 
+  ButtonStyle? mainButtonStyle;
   List<BoxShadow>? boxShadows;
   Gradient? backgroundGradient;
   bool isDismissible;
@@ -59,8 +65,11 @@ class SnackbarConfig {
     this.icon,
     this.textColor = Colors.white,
     this.titleColor,
+    this.titleTextStyle,
     this.messageColor,
+    this.messageTextStyle,
     this.mainButtonTextColor,
+    this.mainButtonStyle,
     this.instantInit = false,
     this.shouldIconPulse = true,
     this.maxWidth,

@@ -10,13 +10,25 @@ class NonReactiveView extends StatelessWidget {
   Widget build(BuildContext context) {
     return ViewModelBuilder<NonReactiveViewModel>.nonReactive(
       builder: (context, viewModel, child) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Non Reactive View'),
+          centerTitle: true,
+        ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            viewModel.updateTitle();
-          },
+          onPressed: viewModel.updateTitle,
         ),
         body: Center(
-          child: Text(viewModel.title),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: viewModel.navigateToNewView,
+                child: const Text('Go to stream counter view'),
+              ),
+              const SizedBox(height: 10),
+              Text(viewModel.title),
+            ],
+          ),
         ),
       ),
       viewModelBuilder: () => NonReactiveViewModel(),

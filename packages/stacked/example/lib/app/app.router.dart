@@ -6,11 +6,9 @@
 
 // ignore_for_file: public_member_api_docs
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:stacked/stacked.dart';
-import 'package:stacked/stacked_annotations.dart';
-import 'package:stacked_generator/src/generators/router/bottom_sheet_container.dart';
 
 import '../ui/bottom_nav/bottom_nav_example.dart';
 import '../ui/details/details_view.dart';
@@ -51,33 +49,30 @@ class StackedRouter extends RouterBase {
   Map<Type, StackedRouteFactory> get pagesMap => _pagesMap;
   final _pagesMap = <Type, StackedRouteFactory>{
     HomeView: (data) {
-      return MaterialWithModalsPageRoute<MaterialWithModalRoute<dynamic>>(
+      return MaterialPageRoute<dynamic>(
         builder: (context) => const HomeView(),
         settings: data,
       );
     },
     BottomNavExample: (data) {
-      return MaterialWithModalsPageRoute<MaterialWithModalRoute<dynamic>>(
+      return MaterialPageRoute<dynamic>(
         builder: (context) => const BottomNavExample(),
         settings: data,
       );
     },
     StreamCounterView: (data) {
-      return CupertinoModalBottomSheetRoute<dynamic>(
-        expanded: true,
-        builder: (context) => BottomSheetContainer(child: StreamCounterView()),
+      return MaterialPageRoute<dynamic>(
+        builder: (context) => const StreamCounterView(),
         settings: data,
       );
     },
     DetailsView: (data) {
       var args = data.getArgs<DetailsViewArguments>(nullOk: false);
-      return CupertinoModalBottomSheetRoute<Map<String, List<String>>>(
-        expanded: true,
-        builder: (context) => BottomSheetContainer(
-            child: DetailsView(
+      return CupertinoPageRoute<Map<String, List<String>>>(
+        builder: (context) => DetailsView(
           key: args.key,
           name: args.name,
-        )),
+        ),
         settings: data,
       );
     },
@@ -85,7 +80,7 @@ class StackedRouter extends RouterBase {
       var args = data.getArgs<ExampleFormViewArguments>(
         orElse: () => ExampleFormViewArguments(),
       );
-      return MaterialWithModalsPageRoute<MaterialWithModalRoute<dynamic>>(
+      return MaterialPageRoute<dynamic>(
         builder: (context) => ExampleFormView(key: args.key),
         settings: data,
       );

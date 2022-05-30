@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:example/ui/form/validators.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked/stacked_annotations.dart';
 
@@ -8,8 +8,16 @@ import 'example_form_viewmodel.dart';
 
 // #1: Add the annotation
 @FormView(fields: [
-  FormTextField(name: 'email', initialValue: "Lorem"),
-  FormTextField(name: 'password', isPassword: true),
+  FormTextField(
+    name: 'email',
+    initialValue: "Lorem",
+    validator: FormValidators.emailValidator,
+  ),
+  FormTextField(
+    name: 'password',
+    isPassword: true,
+    validator: FormValidators.passwordValidator,
+  ),
   FormTextField(name: 'shortBio'),
   FormDateField(name: 'birthDate'),
   FormDropdownField(
@@ -39,10 +47,12 @@ class ExampleFormView extends StatelessWidget with $ExampleFormView {
         viewModel.setDoYouLoveFood(DoYouLoveFoodValueToTitleMap.keys.first);
       },
       builder: (context, viewModel, child) => Scaffold(
+        appBar: AppBar(
+          title: const Text('Example Form View'),
+          centerTitle: true,
+        ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            viewModel.navigateSomewhere();
-          },
+          onPressed: viewModel.navigateToNewView,
         ),
         body: SizedBox(
           width: MediaQuery.of(context).size.width,
@@ -51,40 +61,46 @@ class ExampleFormView extends StatelessWidget with $ExampleFormView {
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
                 ConstrainedBox(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxWidth: 300,
                   ),
                   child: TextFormField(
                     //#4: Set email emailController and focus node
                     controller: emailController,
-                    decoration: InputDecoration(hintText: 'email'),
+                    decoration: const InputDecoration(hintText: 'email'),
                     keyboardType: TextInputType.emailAddress,
                     focusNode: emailFocusNode,
                   ),
                 ),
-                SizedBox(height: 15),
+                if (viewModel.hasEmailValidationMessage)
+                  Text(
+                    viewModel.emailValidationMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                const SizedBox(height: 15),
                 ConstrainedBox(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxWidth: 300,
                   ),
                   child: TextFormField(
                     //#5: Set password passwordController and focus node
+                    key: const ValueKey('passwordField'),
                     controller: passwordController,
-                    decoration: InputDecoration(hintText: 'password'),
+                    decoration: const InputDecoration(hintText: 'password'),
                     keyboardType: TextInputType.visiblePassword,
                     obscureText: true,
                     focusNode: passwordFocusNode,
                     onFieldSubmitted: (_) => viewModel.saveData(),
                   ),
                 ),
-                if (viewModel.showValidation)
+                if (viewModel.hasPasswordValidationMessage)
                   Text(
-                    viewModel.validationMessage!,
-                    style: TextStyle(color: Colors.red),
+                    viewModel.passwordValidationMessage!,
+                    style: const TextStyle(color: Colors.red),
                   ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 ConstrainedBox(
-                  constraints: BoxConstraints(
+                  constraints: const BoxConstraints(
                     maxWidth: 300,
                   ),
                   child: TextField(
@@ -92,13 +108,13 @@ class ExampleFormView extends StatelessWidget with $ExampleFormView {
                     maxLines: null,
                     keyboardType: TextInputType.multiline,
                     controller: shortBioController,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Tell us a bit more about yourself',
                     ),
                     focusNode: shortBioFocusNode,
                   ),
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 ElevatedButton(
                   onPressed: () => viewModel.selectBirthDate(
                       context: context,
@@ -111,12 +127,14 @@ class ExampleFormView extends StatelessWidget with $ExampleFormView {
                         : 'Select your Date of birth',
                   ),
                 ),
-                SizedBox(height: 15),
+                const SizedBox(height: 15),
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Do you love food?'),
-                    SizedBox(width: 15),
+                    const Text('Do you love food?'),
+                    const SizedBox(width: 15),
                     DropdownButton<String>(
+                      key: const ValueKey('dropdownField'),
                       value: viewModel.doYouLoveFoodValue,
                       onChanged: (value) {
                         viewModel.setDoYouLoveFood(value!);
@@ -124,6 +142,7 @@ class ExampleFormView extends StatelessWidget with $ExampleFormView {
                       items: DoYouLoveFoodValueToTitleMap.keys
                           .map(
                             (value) => DropdownMenuItem<String>(
+                              key: ValueKey('$value key'),
                               value: value,
                               child: Text(DoYouLoveFoodValueToTitleMap[value]!),
                             ),
@@ -131,7 +150,13 @@ class ExampleFormView extends StatelessWidget with $ExampleFormView {
                           .toList(),
                     )
                   ],
-                )
+                ),
+                const SizedBox(height: 15),
+                if (viewModel.showValidationMessage)
+                  Text(
+                    viewModel.validationMessage!,
+                    style: const TextStyle(color: Colors.red),
+                  ),
               ],
             ),
           ),

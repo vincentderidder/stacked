@@ -122,7 +122,7 @@ void setupDialogUi() {
 class _BasicDialog extends StatelessWidget {
   final DialogRequest request;
   final Function(DialogResponse) completer;
-  const _BasicDialog({Key key, this.request, this.completer}) : super(key: key);
+  const _BasicDialog({Key? key, this.request, this.completer}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +135,7 @@ class _BasicDialog extends StatelessWidget {
 class _FormDialog extends StatelessWidget {
   final DialogRequest request;
   final Function(DialogResponse) completer;
-  const _FormDialog({Key key, this.request, this.completer}) : super(key: key);
+  const _FormDialog({Key? key, this.request, this.completer}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -197,7 +197,7 @@ After you have created your register function go to your main.dart file and afte
 
 ```dart
 void main() {
-  setupLocator();
+  await setupLocator();
   setupDialogUi();
   runApp(MyApp());
 }
@@ -253,7 +253,7 @@ The `NavigationService` will allow you to navigate your app easily from the `Vie
 | `clearTillFirstAndShow`     | `Future<dynamic>` | Pops the navigation stack until there's 1 view left then pushes `routeName` onto the stack                        |
 | `clearTillFirstAndShowView` | `Future<dynamic>` | Pops the navigation stack until there's 1 view left then pushes `view` onto the stack                             |
 | `pushNamedAndRemoveUntil`   | `Future<dynamic>` | Push route and clear stack until predicate is satisfied                                                           |
-|  |
+|                             |
 
 ## Route observation
 
@@ -321,7 +321,7 @@ Then in the main.dart file before running the app, after setting up the locator 
 
 ```dart
 void main() {
-  setupLocator();
+  await setupLocator();
   setupSnackbarUi();
   runApp(MyApp());
 }
@@ -455,7 +455,7 @@ class _FloatingBoxBottomSheet extends StatelessWidget {
   final SheetRequest request;
   final Function(SheetResponse) completer;
   const _FloatingBoxBottomSheet({
-    Key key,
+    Key? key,
     this.request,
     this.completer,
   }) : super(key: key);

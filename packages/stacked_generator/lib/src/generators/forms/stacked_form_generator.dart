@@ -1,16 +1,19 @@
+import 'dart:async';
+
 import 'package:analyzer/dart/constant/value.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
 import 'package:source_gen/source_gen.dart';
-import 'package:stacked/stacked_annotations.dart';
+import 'package:stacked_core/stacked_core.dart';
 import 'package:stacked_generator/import_resolver.dart';
 import 'package:stacked_generator/src/generators/forms/field_config.dart';
 import 'package:stacked_generator/src/generators/forms/form_view_config.dart';
 import 'package:stacked_generator/src/generators/forms/stacked_form_content_generator.dart';
 
+
 class StackedFormGenerator extends GeneratorForAnnotation<FormView> {
   @override
-  dynamic generateForAnnotatedElement(
+  FutureOr<String> generateForAnnotatedElement(
     Element classForAnnotation,
     ConstantReader formView,
     BuildStep buildStep,
@@ -75,9 +78,13 @@ FieldConfig _readTextFieldConfig({
 }) {
   final String name = (fieldReader.peek('name')?.stringValue) ?? '';
   final String? initialValue = (fieldReader.peek('initialValue')?.stringValue);
+  final ExecutableElement? validatorFunction =
+      (fieldReader.peek('validator')?.objectValue)?.toFunctionValue();
+
   return TextFieldConfig(
     name: name,
     initialValue: initialValue,
+    validatorFunction: validatorFunction,
   );
 }
 

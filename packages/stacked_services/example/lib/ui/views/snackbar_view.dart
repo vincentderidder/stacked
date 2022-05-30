@@ -1,10 +1,12 @@
-import 'package:example/app/locator.dart';
+import '../../app/app.locator.dart';
 import 'package:example/enums/snackbar_type.dart';
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import '../../app/app.locator.dart';
+
 class SnackbarView extends StatelessWidget {
-  SnackbarView({Key key}) : super(key: key);
+  SnackbarView({Key? key}) : super(key: key);
 
   final _snackbarService = locator<SnackbarService>();
 

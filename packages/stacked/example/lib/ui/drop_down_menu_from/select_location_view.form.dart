@@ -33,11 +33,6 @@ mixin $SelectLocationView on StatelessWidget {
   /// with the latest textController values
   void listenToFormUpdated(FormViewModel model) {}
 
-  /// Updates the formData on the FormViewModel
-  void _updateFormData(FormViewModel model) => model.setData(
-        model.formValueMap..addAll({}),
-      );
-
   /// Calls dispose on all the generated controllers and focus nodes
   void disposeForm() {
     // The dispose function for a TextEditingController sets all listeners to null
@@ -45,19 +40,34 @@ mixin $SelectLocationView on StatelessWidget {
 }
 
 extension ValueProperties on FormViewModel {
-  String? get countryValue => this.formValueMap[CountryValueKey];
-  String? get provinceValue => this.formValueMap[ProvinceValueKey];
+  String? get countryValue => formValueMap[CountryValueKey] as String?;
+  String? get provinceValue => formValueMap[ProvinceValueKey] as String?;
 
-  bool get hasCountry => this.formValueMap.containsKey(CountryValueKey);
-  bool get hasProvince => this.formValueMap.containsKey(ProvinceValueKey);
+  bool get hasCountry => formValueMap.containsKey(CountryValueKey);
+  bool get hasProvince => formValueMap.containsKey(ProvinceValueKey);
+
+  bool get hasCountryValidationMessage =>
+      fieldsValidationMessages[CountryValueKey]?.isNotEmpty ?? false;
+  bool get hasProvinceValidationMessage =>
+      fieldsValidationMessages[ProvinceValueKey]?.isNotEmpty ?? false;
+
+  String? get countryValidationMessage =>
+      fieldsValidationMessages[CountryValueKey];
+  String? get provinceValidationMessage =>
+      fieldsValidationMessages[ProvinceValueKey];
 }
 
 extension Methods on FormViewModel {
   void setCountry(String country) {
-    this.setData(this.formValueMap..addAll({CountryValueKey: country}));
+    setData(formValueMap..addAll({CountryValueKey: country}));
   }
 
   void setProvince(String province) {
-    this.setData(this.formValueMap..addAll({ProvinceValueKey: province}));
+    setData(formValueMap..addAll({ProvinceValueKey: province}));
   }
+
+  setCountryValidationMessage(String? validationMessage) =>
+      fieldsValidationMessages[CountryValueKey] = validationMessage;
+  setProvinceValidationMessage(String? validationMessage) =>
+      fieldsValidationMessages[ProvinceValueKey] = validationMessage;
 }
