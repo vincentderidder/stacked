@@ -9,7 +9,12 @@ class RouteData extends RouteSettings {
       : _pathParams = routeMatch.pathParams,
         _queryParams = routeMatch.queryParams,
         fragment = routeMatch.uri.fragment,
-        super(name: routeMatch.name, arguments: routeMatch.arguments);
+        super(
+          name: routeMatch.name,
+          arguments: routeMatch.arguments is Map
+              ? ((routeMatch.arguments as Map?)?['arguments'])
+              : routeMatch.arguments,
+        );
 
   final RouteMatch routeMatch;
   final Parameters _pathParams;
